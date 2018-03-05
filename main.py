@@ -69,6 +69,62 @@ def poem(length, nouns, adjectives, verbs):
 			print("~to " + choice(verbs) + " is to " + choice(verbs))
 			print()
 
+def poem_html(length, nouns, adjectives, verbs):
+	print("<div class=\"poem\">")
+	for x in range(length):
+		words1 = " ".join([choice(adjectives) + ", ", choice(adjectives)])
+		words2 = " ".join([choice(nouns), choice(verbs)])
+		words3 = " ".join([choice(nouns), choice(nouns), choice(adjectives), choice(nouns)])
+
+		for i in range(randint(2,5)):
+			words = choice([words1, words2, words3])
+			line = ""
+			if len(words) < 40:
+				line = " "*randint(0, 40 - len(words)) + words
+			else:
+				line = words
+			line = "<p class=\"verse\">" + line + "</p>"
+			print(line)
+
+		if x % 3 ==0:
+			print("<p class=\"verse3\">")
+			print(choice(adjectives))
+			print(choice(verbs))
+			print("the " + choice(nouns) +"!")
+			print("</p>")
+
+		if x % 5 ==0:
+			print("<p class=\"verse5\">")
+			print(choice(nouns) + "y")
+			verb = choice(verbs)
+			if verb[-1] == "e":
+    				print(choice(verbs)[:-1] + "ing")
+			else:
+					print(choice(verbs) + "ing")
+			n = choice(nouns)
+			if n[-1] == "e":
+				n = n + "r"
+			if n[-3:] == "ion":
+				n = n[:-3] + "or"
+			else:
+				n = n + "er"
+			print("the" + ((" " + n) * randint(1,3)) +"!")
+			print("</p>")
+
+		if x % 7 ==0:
+			print("<p class=\"verse7\">")
+			print("the " + choice(adjectives) + " " + choice(nouns))
+			print(choice(verbs)+ "s")
+			print("the " + choice(adjectives) + " " + choice(nouns))
+			print("</p>")
+
+		if x % 11 ==0:
+			print("<p class=\"verse11\">")
+			print("~to " + choice(verbs) + " is to " + choice(verbs))
+			print("</p>")
+
+	print("</div>")
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("author", type=str, help="the author\'s name")
@@ -76,6 +132,7 @@ if __name__ == "__main__":
 	parser.add_argument("adjectives", type=str, help="the file containing the adjectives database. Each word must be on his line")
 	parser.add_argument("verbs", type=str, help="the file containing the verbs database. Each word must be on his line")
 	parser.add_argument("output", type=str, help="the output file")
+	parser.add_argument("length", type=int, help="the number of poems generated")
 	args = parser.parse_args()
 
 	nouns = open(args.nouns).read().split('\n')
@@ -86,11 +143,11 @@ if __name__ == "__main__":
 	log_file = open(args.output,"a")
 	sys.stdout = log_file
 
-	length = 150
+	length = int(args.length)
 
 	for n in range(1,length):
-		header(n, args.author)
-		poem(3, nouns, adjectives, verbs)
+		# header(n, args.author)
+		poem_html(3, nouns, adjectives, verbs)
 
 	sys.stdout = old_stdout
 	log_file.close()
