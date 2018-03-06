@@ -1,0 +1,25 @@
+.poem{
+    border-bottom: 1px dotted black;
+    width: 100%;
+    padding-top: 5px;
+    padding-bottom: 15px;
+}
+
+.verse3 {
+    color: red;
+}
+
+.verse5{
+    font-weight: bold;
+}
+
+.verse7, .verse11{
+    margin-left: 20px;
+}
+
+p{
+    width: 50%;
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 2px solid red;
+}

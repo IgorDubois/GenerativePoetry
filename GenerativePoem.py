@@ -4,6 +4,8 @@ from random import choice, randint
 import datetime, sys, textwrap
 from time import gmtime, strftime
 import argparse
+from bs4 import BeautifulSoup
+from io import StringIO
 
 def num(s):
 	try:
@@ -69,7 +71,22 @@ def poem(length, nouns, adjectives, verbs):
 			print("~to " + choice(verbs) + " is to " + choice(verbs))
 			print()
 
+def header_html(author):
+	s = """<html lang=\"en\">
+			<head>
+			\t<meta charset="UTF-8">
+			\t<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			\t<meta http-equiv="X-UA-Compatible" content="ie=edge">
+			\t<title>Generative Poetry by {}</title>
+			\t<link rel="stylesheet" href="./reset.css">
+			\t<link href="https://fonts.googleapis.com/css?family=Inconsolata:400,700" rel="stylesheet">
+			\t<link rel="stylesheet" href="./style.css">
+		</head>
+		<body onload="display()">"""
+	print(s.format(author))
+
 def poem_html(length, nouns, adjectives, verbs):
+	# insertion de lignes vides randomisées jusqu'à obtenir n lignes par poême
 	print("<div class=\"poem\">")
 	for x in range(length):
 		words1 = " ".join([choice(adjectives) + ", ", choice(adjectives)])
@@ -88,19 +105,19 @@ def poem_html(length, nouns, adjectives, verbs):
 
 		if x % 3 ==0:
 			print("<p class=\"verse3\">")
-			print(choice(adjectives))
-			print(choice(verbs))
-			print("the " + choice(nouns) +"!")
+			print("<span>" + choice(adjectives) + "</span>")
+			print("<span>" + choice(verbs) + "</span>")
+			print("<span>" + "the " + choice(nouns) +"!" + "</span>")
 			print("</p>")
 
 		if x % 5 ==0:
 			print("<p class=\"verse5\">")
-			print(choice(nouns) + "y")
+			print("<span>" + choice(nouns) + "y")
 			verb = choice(verbs)
 			if verb[-1] == "e":
-    				print(choice(verbs)[:-1] + "ing")
+    				print("<span>" + choice(verbs)[:-1] + "ing" + "</span>")
 			else:
-					print(choice(verbs) + "ing")
+					print("<span>" + choice(verbs) + "ing" + "</span>")
 			n = choice(nouns)
 			if n[-1] == "e":
 				n = n + "r"
@@ -108,14 +125,14 @@ def poem_html(length, nouns, adjectives, verbs):
 				n = n[:-3] + "or"
 			else:
 				n = n + "er"
-			print("the" + ((" " + n) * randint(1,3)) +"!")
+			print("<span>" + "the" + ((" " + n) * randint(1,3)) +"!" + "</span>")
 			print("</p>")
 
 		if x % 7 ==0:
 			print("<p class=\"verse7\">")
-			print("the " + choice(adjectives) + " " + choice(nouns))
-			print(choice(verbs)+ "s")
-			print("the " + choice(adjectives) + " " + choice(nouns))
+			print("<span>" + "the " + choice(adjectives) + " " + choice(nouns) + "</span>")
+			print("<span>" + choice(verbs)+ "s" + "</span>")
+			print("<span>" + "the " + choice(adjectives) + " " + choice(nouns) + "</span>")
 			print("</p>")
 
 		if x % 11 ==0:
@@ -139,15 +156,23 @@ if __name__ == "__main__":
 	adjectives = open(args.adjectives).read().split('\n')
 	verbs = open(args.verbs).read().split('\n')
 
+	poem_buffer = StringIO()
 	old_stdout = sys.stdout
-	log_file = open(args.output,"a")
-	sys.stdout = log_file
+	sys.stdout = poem_buffer
 
 	length = int(args.length)
 
+	header_html(args.author)
 	for n in range(1,length):
-		# header(n, args.author)
 		poem_html(3, nouns, adjectives, verbs)
-
+	print("</body></html>")
+	
+	html_doc = BeautifulSoup(poem_buffer.getvalue(), "html.parser")
+	poem_buffer.close()
+	html_doc = html_doc.prettify()
+	log_file = open(args.output, "w")
+	sys.stdout = log_file
+	print(html_doc)
+	
 	sys.stdout = old_stdout
 	log_file.close()
